@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplicación de Filtros de Imagen</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #f0f0f0;
+        }
+        .container {
+            position: relative;
+            width: 100vw;  /* Asegura que ocupe todo el ancho de la ventana */
+            height: 100vh; /* Asegura que ocupe todo el alto de la ventana */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden; /* Evita el desbordamiento */
+        }
+        img {
+            max-width: 100%;
+            max-height: 70%; /* Limita la altura de la imagen al 70% */
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            display: none; /* Inicialmente oculta la imagen */
+            object-fit: contain; /* Mantiene la relación de aspecto */
+        }
+        .buttons {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap; /* Permite que los botones se ajusten en líneas múltiples */
+            justify-content: center; /* Centra los botones */
+        }
+        .button {
+            padding: 10px 20px;
+            background-color: #6200ea;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: background-color 0.3s;
+        }
+        .button:hover {
+            background-color: #3700b3;
+        }
+        input[type="file"] {
+            display: none; /* Oculta el input de archivo */
+        }
+        /* Estilos para el control deslizante */
+        .slider-container {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        input[type="range"] {
+            width: 80%; /* Ancho del control deslizante */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <input type="file" id="fileInput" accept="image/*">
+        <label for="fileInput" class="button">
+            <span class="material-icons">upload</span>
+            Cargar Imagen
+        </label>
+        <img id="image" alt="Imagen Cargada">
+        <div class="buttons">
+            <button class="button" onclick="applyFilter('none')">Normal</button>
+            <button class="button" onclick="applyFilter('grayscale(100%)')">Grayscale</button>
+            <button class="button" onclick="applyFilter('sepia(100%)')">Sepia</button>
+            <button class="button" onclick="applyFilter('invert(100%)')">Invertir</button>
+            <button class="button" onclick="resetHue()">Restablecer Tono</button>
+        </div>
+        <div class="slider-container">
+            <label for="hueSlider">Ajustar Tono:</label>
+            <input type="range" id="hueSlider" min="0" max="360" value="0" step="1">
+        </div>
+    </div>
+    
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const image = document.getElementById('image');
+        const hueSlider = document.getElementById('hueSlider');
+
+        fileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    image.src = e.target.result;
+                    image.style.display = 'block'; // Muestra la imagen
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        hueSlider.addEventListener('input', (event) => {
+            const hueValue = event.target.value;
+            applyFilter(`hue-rotate(${hueValue}deg)`); // Aplica el filtro de tono según el valor del slider
+        });
+
+        function applyFilter(filter) {
+            image.style.filter = filter; // Aplica el filtro seleccionado
+        }
+
+        function resetHue() {
+            hueSlider.value = 0; // Resetea el slider a 0
+            applyFilter('none'); // Aplica filtro normal
+        }
+    </script>
+</body>
+</html>
