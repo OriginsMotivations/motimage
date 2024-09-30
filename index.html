@@ -6,16 +6,25 @@
     <title>Aplicación de Filtros de Imagen</title>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body, html {
             margin: 0;
             padding: 0;
             height: 100%;
+            width: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
         }
+
         .container {
             position: relative;
             width: 100vw;  /* Asegura que ocupe todo el ancho de la ventana */
@@ -24,25 +33,30 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            overflow: hidden; /* Evita el desbordamiento */
+            padding: 10px;
+            gap: 10px;
         }
+
         img {
-            max-width: 100%;
-            max-height: 70%; /* Limita la altura de la imagen al 70% */
+            max-width: 90vw;
+            max-height: 50vh;
             border: 2px solid #ccc;
             border-radius: 8px;
             display: none; /* Inicialmente oculta la imagen */
             object-fit: contain; /* Mantiene la relación de aspecto */
         }
+
         .buttons {
-            margin-top: 20px;
+            margin-top: 10px;
             display: flex;
             gap: 10px;
-            flex-wrap: wrap; /* Permite que los botones se ajusten en líneas múltiples */
-            justify-content: center; /* Centra los botones */
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 100%;
         }
+
         .button {
-            padding: 10px 20px;
+            padding: 10px 15px;
             background-color: #6200ea;
             color: white;
             border: none;
@@ -52,22 +66,31 @@
             align-items: center;
             gap: 5px;
             transition: background-color 0.3s;
+            font-size: 16px;
         }
+
         .button:hover {
             background-color: #3700b3;
         }
+
         input[type="file"] {
             display: none; /* Oculta el input de archivo */
         }
-        /* Estilos para el control deslizante */
+
         .slider-container {
-            margin-top: 20px;
+            margin-top: 10px;
             display: flex;
             flex-direction: column;
             align-items: center;
+            width: 100%;
         }
+
         input[type="range"] {
-            width: 80%; /* Ancho del control deslizante */
+            width: 90vw; /* Ancho del control deslizante */
+        }
+
+        .canvas-container {
+            display: none;
         }
     </style>
 </head>
@@ -79,6 +102,7 @@
             Cargar Imagen
         </label>
         <img id="image" alt="Imagen Cargada">
+        <canvas id="canvas" class="canvas-container"></canvas>
         <div class="buttons">
             <button class="button" onclick="applyFilter('none')">Normal</button>
             <button class="button" onclick="applyFilter('grayscale(100%)')">Grayscale</button>
@@ -90,12 +114,17 @@
             <label for="hueSlider">Ajustar Tono:</label>
             <input type="range" id="hueSlider" min="0" max="360" value="0" step="1">
         </div>
+        <div class="buttons">
+            <button class="button" onclick="downloadImage()">Descargar Imagen</button>
+        </div>
     </div>
     
     <script>
         const fileInput = document.getElementById('fileInput');
         const image = document.getElementById('image');
         const hueSlider = document.getElementById('hueSlider');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
 
         fileInput.addEventListener('change', (event) => {
             const file = event.target.files[0];
@@ -121,6 +150,24 @@
         function resetHue() {
             hueSlider.value = 0; // Resetea el slider a 0
             applyFilter('none'); // Aplica filtro normal
+        }
+
+        function downloadImage() {
+            // Configura el canvas con las mismas dimensiones que la imagen
+            canvas.width = image.naturalWidth;
+            canvas.height = image.naturalHeight;
+
+            // Aplicar el filtro que se encuentra en la imagen al canvas
+            ctx.filter = getComputedStyle(image).filter;
+
+            // Dibuja la imagen en el canvas con los filtros aplicados
+            ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+            // Crear el enlace para descargar la imagen
+            const link = document.createElement('a');
+            link.download = 'imagen_filtrada.png'; // Nombre del archivo de descarga
+            link.href = canvas.toDataURL('image/png'); // Convertir el canvas en data URL
+            link.click(); // Simula el clic para descargar la imagen
         }
     </script>
 </body>
